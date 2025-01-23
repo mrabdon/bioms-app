@@ -19,7 +19,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL: postgresql://myuser:mypassword@localhost:5432/mydb
+      - DATABASE_URL= postgresql://myuser:mypassword@82.112.237.48:5432/mydb
     depends_on:
       - postgres
 
