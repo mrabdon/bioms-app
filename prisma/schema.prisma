@@ -1,0 +1,139 @@
+generator client {
+    provider      = "prisma-client-js"
+    binaryTargets = ["native", "windows"]
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Admin {
+    id       String @id
+    username String @unique
+}
+
+model User {
+    id                String     @id
+    email             String     @unique
+    firstname         String
+    lastname          String
+    password          String? // Will be set after email verification
+    username          String? // Will be set after email verification
+    verified          Boolean    @default(false) // Tracks if email is verified
+    verificationToken String?    @unique // Add @unique if you want to query by this field directly
+    resetToken        String? // Token used for password reset
+    resetTokenExpiry  DateTime? // Expiration date for reset token
+    createdAt         DateTime   @default(now())
+    updatedAt         DateTime   @updatedAt
+    img               String?
+    producerId       String?
+  producer         Producer  ?        @relation(fields: [producerId], references: [id])
+    volumes           Volume[]
+}
+
+model Volume {
+    id              Int      @id @default(autoincrement())
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt // Track the update time
+    quarter         String?
+    year            Int?
+    proposedVolume  Int?
+    committedVolume Int?
+    // actualProduceDate DateTime @default(now())
+    // actualProduction  Int?
+    begInventory    Int?
+    totalStock      Int?
+    sold            Int?
+    unsold          Int?
+    users           User[]
+    actualProduces ActualProduce[]
+    volumeSoldToProducers VolumeSoldToProducer[]
+    producerId            String?
+    producer              Producer?              @relation(fields: [producerId], references: [id])
+    consumerId            String?
+    consumer              Consumer?              @relation(fields: [consumerId], references: [id])
+
+}
+
+model ActualProduce {
+    id               Int      @id @default(autoincrement())
+    date             DateTime @default(now())
+    actualProduction Int?
+    month            String?
+
+    volumeId Int?
+    volume   Volume? @relation(fields: [volumeId], references: [id])
+}
+
+model VolumeSoldToProducer {
+    id         Int  @id @default(autoincrement())
+    soldAmount Int
+    mc         Int?
+    mro        Int?
+
+    volumes   Volume[]
+    producers Producer[]
+    consumers Consumer[]
+
+    // volume     Volume?   @relation(fields: [volumeId], references: [id])
+    // volumeId   Int?
+    // producer   Producer? @relation(fields: [producerId], references: [id])
+    // producerId String?
+    // consumer   Consumer? @relation(fields: [consumerId], references: [id])
+    // consumerId String?
+}
+
+model Producer {
+    id                   String                 @id
+    name                 String                 @unique
+    alias                String                 @unique
+    address              String?
+    feedstock            String?
+    createdAt            DateTime               @default(now())
+    users                User[]
+    volumeSoldToProducer VolumeSoldToProducer[]
+    Event                Event[]
+    Announcement         Announcement[]
+    volumes              Volume[]
+}
+
+model Consumer {
+    id                   String                 @id
+    name                 String                 @unique
+    createdAt            DateTime               @default(now())
+    volumeSoldToProducer VolumeSoldToProducer[]
+    volume               Volume[]
+}
+
+model Event {
+    id          Int      @id @default(autoincrement())
+    title       String
+    description String
+    startTime   DateTime
+    endTime     DateTime
+
+    producerId String?
+    producer   Producer? @relation(fields: [producerId], references: [id])
+}
+
+model Announcement {
+    id          Int      @id @default(autoincrement())
+    title       String
+    description String
+    date        DateTime
+
+    producerId String?
+    producer   Producer? @relation(fields: [producerId], references: [id])
+}
+
+enum UserGender {
+    MALE
+    FEMALE
+}
+
+enum Roles {
+    admin
+    producer
+    staff
+}
