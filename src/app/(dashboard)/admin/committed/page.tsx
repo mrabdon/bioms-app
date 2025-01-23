@@ -101,7 +101,7 @@ const CommittedPage = async ({
 
   // ✅ Server-side rendering with no direct event handlers passed
   return (
-    <div className="p-4 flex bg-white gap-4 flex-col md:flex-row">
+    <div className="p-4 flex bg-white gap-4 border flex-col md:flex-row">
       <div className="w-full flex flex-col">
         <TabContainer />
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">

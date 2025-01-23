@@ -16,8 +16,16 @@ export default function DashboardLayout({
           href="/"
           className="flex items-center justify-center lg:justify-start gap-2"
         >
-          <Image src="/logo.png" alt="logo" width={32} height={32} />
-          <span className="hidden lg:block font-bold">SchooLama</span>
+          <Image
+            src="/bioms-logo.png"
+            alt="logo"
+            width={32}
+            height={32}
+            className="rounded-full"
+          />
+          <span className="hidden lg:block font-bold">
+            BiO<span className="text-green-500">MS</span>
+          </span>
         </Link>
         <Menu />
       </div>
