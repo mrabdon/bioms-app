@@ -1,7 +1,6 @@
 import prisma from "@/lib/prisma";
 import { SignOutButton, UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
-import { User } from "@prisma/client";
 import Image from "next/image";
 
 const Navbar = async () => {

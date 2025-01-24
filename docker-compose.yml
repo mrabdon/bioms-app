@@ -1,13 +1,13 @@
 version: "3.8"
 
 services:
-  postgress:
+  postgres:
     image: postgres:15
-    container_name: bioms_postgres
+    container_name: postgres_db
     environment:
-      POSTGRES_USER: biomsdev
-      POSTGRES_PASSWORD: bioms2024
-      POSTGRES_DB: bioms
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
     ports:
       - "5432:5432"
     volumes:
@@ -15,11 +15,11 @@ services:
 
   app:
     build: .
-    container_name: bioms_postgres
+    container_name: nextjs_app
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL: postgresql://biomsdev:bioms2024@85432:5432/bioms
+      - DATABASE_URL: postgresql://myuser:mypassword@82.112.237.48:5432/mydb
     depends_on:
       - postgres
 
