@@ -9,101 +9,145 @@ datasource db {
 }
 
 model Admin {
-    id       String @id
-    username String @unique
+    id        String   @id @default(uuid())
+    firstName String?
+    lastName  String?
+    email     String   @unique
+    username  String? // Will be set after email verification
+    password  String? // Will be set after email verification
+    //others
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    img       String?
 }
 
-model User {
-    id                String     @id
-    email             String     @unique
-    firstname         String
-    lastname          String
-    password          String? // Will be set after email verification
-    username          String? // Will be set after email verification
-    verified          Boolean    @default(false) // Tracks if email is verified
-    verificationToken String?    @unique // Add @unique if you want to query by this field directly
-    resetToken        String? // Token used for password reset
-    resetTokenExpiry  DateTime? // Expiration date for reset token
-    createdAt         DateTime   @default(now())
-    updatedAt         DateTime   @updatedAt
-    img               String?
-    producerId       String?
-  producer         Producer  ?        @relation(fields: [producerId], references: [id])
-    volumes           Volume[]
+model Producer {
+    id        String   @id
+    firstName String
+    lastName  String
+    email     String   @unique
+    username  String? // Will be set after email verification
+    password  String? // Will be set after email verification
+    //others
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    img       String?
+    company   Company? @relation(fields: [companyId], references: [id])
+    companyId String?
+
+    Volume       Volume[]
+    Sold         Sold[]
+    Event        Event[]
+    Announcement Announcement[]
+}
+
+model Staff {
+    id        String   @id
+    firstName String
+    lastName  String
+    email     String   @unique
+    username  String? // Will be set after email verification
+    password  String? // Will be set after email verification
+    //others
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    img       String?
+    company   Company? @relation(fields: [companyId], references: [id])
+    companyId String?
+    Volume    Volume?  @relation(fields: [volumeId], references: [id])
+    volumeId  Int?
+}
+
+model Company {
+    id           String         @id
+    name         String         @unique
+    alias        String         @unique
+    address      String?
+    feedstock    String?
+    createdAt    DateTime       @default(now())
+    producers    Producer[]
+    staffs       Staff[]
+    sold         Sold[]
+    Event        Event[]
+    Announcement Announcement[]
+    volumes      Volume[]
+}
+
+model Consumer {
+    id        String   @id
+    name      String   @unique
+    createdAt DateTime @default(now())
+    solds     Sold[]
+    volume    Volume[]
 }
 
 model Volume {
-    id              Int      @id @default(autoincrement())
-    createdAt       DateTime @default(now())
-    updatedAt       DateTime @updatedAt // Track the update time
+    id              Int       @id @default(autoincrement())
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt // Track the update time
     quarter         String?
     year            Int?
     proposedVolume  Int?
     committedVolume Int?
-    // actualProduceDate DateTime @default(now())
-    // actualProduction  Int?
     begInventory    Int?
     totalStock      Int?
     sold            Int?
     unsold          Int?
-    users           User[]
-    actualProduces ActualProduce[]
-    volumeSoldToProducers VolumeSoldToProducer[]
-    producerId            String?
-    producer              Producer?              @relation(fields: [producerId], references: [id])
-    consumerId            String?
-    consumer              Consumer?              @relation(fields: [consumerId], references: [id])
+    archived        Boolean   @default(false) // Indicates if the user is archived
+    archivedAt      DateTime? // Timestamp when the user was archived
 
+    companies  Company[]
+    staffs     Staff[]
+    produces   Produce[]
+    solds      Sold[]
+    producerId String?
+    producer   Producer? @relation(fields: [producerId], references: [id])
+    consumerId String?
+    consumer   Consumer? @relation(fields: [consumerId], references: [id])
 }
 
-model ActualProduce {
-    id               Int      @id @default(autoincrement())
-    date             DateTime @default(now())
-    actualProduction Int?
-    month            String?
+model Produce {
+    id                     Int      @id @default(autoincrement())
+    date                   DateTime @default(now())
+    actualProduction       Int?
+    remainingProduceVolume Int?
+    month                  String?
 
     volumeId Int?
     volume   Volume? @relation(fields: [volumeId], references: [id])
+    solds    Sold[]
 }
 
-model VolumeSoldToProducer {
-    id         Int  @id @default(autoincrement())
+model Sold {
+    id         Int      @id @default(autoincrement())
     soldAmount Int
     mc         Int?
     mro        Int?
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
 
-    volumes   Volume[]
-    producers Producer[]
-    consumers Consumer[]
-
-    // volume     Volume?   @relation(fields: [volumeId], references: [id])
-    // volumeId   Int?
-    // producer   Producer? @relation(fields: [producerId], references: [id])
-    // producerId String?
-    // consumer   Consumer? @relation(fields: [consumerId], references: [id])
-    // consumerId String?
+    produceId  Int?
+    produce    Produce?  @relation(fields: [produceId], references: [id])
+    consumerId String
+    consumer   Consumer  @relation(fields: [consumerId], references: [id])
+    volume     Volume?   @relation(fields: [volumeId], references: [id])
+    volumeId   Int?
+    Producer   Producer? @relation(fields: [producerId], references: [id])
+    producerId String?
+    lifts      Lift[]
+    Company    Company?  @relation(fields: [companyId], references: [id])
+    companyId  String?
 }
 
-model Producer {
-    id                   String                 @id
-    name                 String                 @unique
-    alias                String                 @unique
-    address              String?
-    feedstock            String?
-    createdAt            DateTime               @default(now())
-    users                User[]
-    volumeSoldToProducer VolumeSoldToProducer[]
-    Event                Event[]
-    Announcement         Announcement[]
-    volumes              Volume[]
-}
-
-model Consumer {
-    id                   String                 @id
-    name                 String                 @unique
-    createdAt            DateTime               @default(now())
-    volumeSoldToProducer VolumeSoldToProducer[]
-    volume               Volume[]
+model Lift {
+    id                  Int      @id @default(autoincrement())
+    date                DateTime @default(now())
+    liftVolume          Int
+    remainingLiftVolume Int?
+    region              String
+    remark              String
+    soldId              Int?
+    sold                Sold?    @relation(fields: [soldId], references: [id])
 }
 
 model Event {
@@ -115,7 +159,27 @@ model Event {
 
     producerId String?
     producer   Producer? @relation(fields: [producerId], references: [id])
+    Company    Company?  @relation(fields: [companyId], references: [id])
+    companyId  String?
 }
+
+// model Sale {
+//     id            Int      @id @default(autoincrement())
+//     region        String
+//     invoiceNumber Int
+//     lifted        Int
+//     date          DateTime
+
+//     consumerId String
+//     consumer   Consumer @relation(fields: [consumerId], references: [id])
+// }
+
+// model Invoice {
+//     id          Int      @id @default(autoincrement())
+//     producerId  String
+//     produceId   Int
+//     invoiceDate DateTime
+// }
 
 model Announcement {
     id          Int      @id @default(autoincrement())
@@ -125,6 +189,18 @@ model Announcement {
 
     producerId String?
     producer   Producer? @relation(fields: [producerId], references: [id])
+    Company    Company?  @relation(fields: [companyId], references: [id])
+    companyId  String?
+}
+
+model TransactionLog {
+    id          Int      @id @default(autoincrement())
+    entityType  String // Name of the entity affected (e.g., "User", "Producer", "Volume", "Sold")
+    entityId    String // ID of the affected entity
+    action      String // Action type: CREATE, UPDATE, DELETE
+    changedData Json? // Stores the changed values in JSON format
+    performedBy String // ID of the user who performed the action
+    performedAt DateTime @default(now()) // Timestamp of the action
 }
 
 enum UserGender {

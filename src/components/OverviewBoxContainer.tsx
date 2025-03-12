@@ -11,15 +11,15 @@ import {
 const OverviewBoxContainer = async () => {
   const producersCount = await prisma.producer.count();
   const consumerCount = await prisma.consumer.count();
-  const userCount = await prisma.user.count();
+  const userCount = await prisma.producer.count();
 
-  const totalActualProduction = await prisma.actualProduce.aggregate({
+  const totalActualProduction = await prisma.produce.aggregate({
     _sum: {
       actualProduction: true,
     },
   });
 
-  const totalSold = await prisma.volumeSoldToProducer.aggregate({
+  const totalSold = await prisma.sold.aggregate({
     _sum: {
       soldAmount: true,
     },

@@ -3,53 +3,57 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import InputField from "../InputField";
-import { ProducerSchema, producerSchema } from "@/lib/formValidationSchemas";
-import { createProducer, updateProducer } from "@/lib/actions";
+import {
+  announcementSchema,
+  AnnouncementSchema,
+  eventSchema,
+  EventSchema,
+} from "@/lib/formValidationSchemas";
+import {
+  createAnnouncement,
+  createEvent,
+  updateAnnouncement,
+  updateEvent,
+} from "@/lib/actions";
 import { useFormState } from "react-dom";
-import { useEffect, Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 
-const ProducerForm = ({
+const EventForm = ({
   type,
   data,
   setOpen,
+  relatedData,
 }: {
-  type: "create" | "update" | "createActual";
+  type:
+    | "create"
+    | "update"
+    | "invite"
+    | "createProduce"
+    | "createSold"
+    | "createLift";
   data?: any;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  relatedData?: any;
 }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
-  } = useForm<ProducerSchema>({
-    resolver: zodResolver(producerSchema),
+  } = useForm<EventSchema>({
+    resolver: zodResolver(eventSchema),
   });
 
+  // AFTER REACT 19 IT'LL BE USEACTIONSTATE
+
   const [state, formAction] = useFormState(
-    type === "create" ? createProducer : updateProducer,
+    type === "create" ? createEvent : updateEvent,
     {
       success: false,
       error: false,
     }
   );
-
-  // Function to generate ID
-  const generateID = (): string => {
-    const year = new Date().getFullYear(); // Get the current year
-    const sequentialNumber = Math.floor(Math.random() * 1000000); // Generate a random 6-digit number
-    const id = `${year}${String(sequentialNumber).padStart(6, "0")}`; // Format ID
-    return id;
-  };
-
-  useEffect(() => {
-    if (type === "create") {
-      const generatedID = generateID(); // Generate ID if it's create type
-      setValue("id", generatedID); // Set the ID value in the form
-    }
-  }, [type, setValue]);
 
   const onSubmit = handleSubmit((data) => {
     console.log(data);
@@ -60,83 +64,88 @@ const ProducerForm = ({
 
   useEffect(() => {
     if (state.success) {
-      toast(`Producer has been ${type === "create" ? "created" : "updated"}`);
+      toast.success(
+        `Event has been ${type === "create" ? "created" : "updated"}!`
+      );
       setOpen(false);
       router.refresh();
     }
   }, [state, router, type, setOpen]);
 
+  // const { producers } = relatedData;
+
   return (
     <form className="flex flex-col gap-8" onSubmit={onSubmit}>
       <h1 className="text-xl font-semibold">
-        {type === "create" ? "Create a new Producer" : "Update the Producer"}
+        {type === "create"
+          ? "Create a new announcement"
+          : "Update the announcement"}
       </h1>
-      <span className="text-xs text-gray-400 font-medium">
-        Producer Information
-      </span>
-      <div className="flex flex-col gap-4">
-        <InputField
-          label="Id Number"
-          name="id"
-          defaultValue={data?.id}
-          register={register}
-          error={errors?.id}
-          disabled={true}
-          className="w-full"
-        />
-      </div>
-      <div className="flex flex-col gap-4">
-        <InputField
-          label="Name"
-          name="name"
-          defaultValue={data?.name}
-          register={register}
-          error={errors?.name}
-          className="w-full"
-        />
-      </div>
-      <div className="flex flex-col gap-4">
-        <InputField
-          label="Alias"
-          name="alias"
-          defaultValue={data?.alias}
-          register={register}
-          error={errors?.alias}
-          className="w-full"
-        />
-      </div>
-      <div className="flex flex-col gap-4">
-        <InputField
-          label="Location"
-          name="address"
-          defaultValue={data?.address}
-          register={register}
-          error={errors?.address}
-          className="w-full"
-        />
-      </div>
-      <div className="flex flex-col gap-4">
-        <InputField
-          label="Feedstock"
-          name="feedstock"
-          defaultValue={data?.feedstock}
-          register={register}
-          error={errors?.feedstock}
-          className="w-full"
-        />
-      </div>
 
-      {data && (
+      <div className="flex justify-between flex-wrap gap-4">
         <InputField
-          label="Id"
-          name="id"
-          defaultValue={data?.id}
+          label="Title"
+          name="title"
+          defaultValue={data?.title}
           register={register}
-          error={errors?.id}
-          hidden
-          className="w-full"
+          error={errors?.title}
         />
-      )}
+        <InputField
+          label="Description"
+          name="description"
+          defaultValue={data?.description}
+          register={register}
+          error={errors?.description}
+        />
+        <InputField
+          label="Start Date"
+          name="startTime"
+          defaultValue={data?.startTime}
+          register={register}
+          error={errors?.startTime}
+          type="datetime-local"
+        />
+        <InputField
+          label="End Date"
+          name="endTime"
+          defaultValue={data?.endTime}
+          register={register}
+          error={errors?.endTime}
+          type="datetime-local"
+        />
+
+        {/* <div className="flex flex-col gap-2 w-full md:w-1/4">
+          <label className="text-xs text-gray-500">Producer</label>
+          <select
+            multiple
+            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+            {...register("producers")}
+            defaultValue={data?.producers}
+          >
+            {producers.map((producers: { id: string; name: string }) => (
+              <option value={producers.id} key={producers.id}>
+                {producers.name}
+              </option>
+            ))}
+          </select>
+          {errors.producers?.message && (
+            <p className="text-xs text-red-400">
+              {errors.producers.message.toString()}
+            </p>
+          )}
+        </div> */}
+
+        {data && (
+          <InputField
+            label="Id"
+            name="id"
+            defaultValue={data?.id}
+            register={register}
+            error={errors?.id}
+            hidden
+          />
+        )}
+      </div>
       {state.error && (
         <span className="text-red-500">Something went wrong!</span>
       )}
@@ -147,4 +156,4 @@ const ProducerForm = ({
   );
 };
 
-export default ProducerForm;
+export default EventForm;

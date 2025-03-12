@@ -2,11 +2,18 @@
 
 import { revalidatePath } from "next/cache";
 import {
-  ActualProduceSchema,
+  AdminSchema,
   AnnouncementSchema,
+  CompanySchema,
   ConsumerSchema,
   EventSchema,
+  inviteSchema,
+  InviteSchema,
+  LiftSchema,
   ProducerSchema,
+  ProduceSchema,
+  SoldSchema,
+  StaffSchema,
   UserSchema,
   VolumeSchema,
 } from "./formValidationSchemas";
@@ -19,12 +26,12 @@ type CurrentState = {
 };
 
 //=================================PRODUCERS===============================================================
-export const createProducer = async (
+export const createCompany = async (
   currentState: CurrentState,
-  data: ProducerSchema
+  data: CompanySchema
 ) => {
   try {
-    await prisma.producer.create({
+    await prisma.company.create({
       data: {
         id: data.id,
         name: data.name,
@@ -42,12 +49,12 @@ export const createProducer = async (
   }
 };
 
-export const updateProducer = async (
+export const updateCompany = async (
   currentState: CurrentState,
-  data: ProducerSchema
+  data: CompanySchema
 ) => {
   try {
-    await prisma.producer.update({
+    await prisma.company.update({
       where: {
         id: data.id,
       },
@@ -66,7 +73,7 @@ export const updateProducer = async (
   }
 };
 
-export const deleteProducer = async (
+export const deleteCompany = async (
   currentState: CurrentState,
   data: FormData
 ) => {
@@ -77,7 +84,7 @@ export const deleteProducer = async (
   }
 
   try {
-    await prisma.producer.delete({
+    await prisma.company.delete({
       where: {
         id: id, // Keep the id as a string since Prisma expects it to be a string.
       },
@@ -161,6 +168,7 @@ export const createUser = async (
   try {
     const user = await clerkClient.users.createUser({
       emailAddress: [data.email],
+      password: "Bioms@2024",
       username: data.username,
       firstName: data.firstName,
       lastName: data.lastName,
@@ -169,13 +177,13 @@ export const createUser = async (
       },
     });
 
-    await prisma.user.create({
+    await prisma.producer.create({
       data: {
         id: user.id,
         email: data.email,
         username: data.username,
-        firstname: data.firstName,
-        lastname: data.lastName,
+        firstName: data.firstName,
+        lastName: data.lastName,
         img: data.img || null,
       },
     });
@@ -193,7 +201,7 @@ export const updateUser = async (
   data: UserSchema
 ) => {
   try {
-    await prisma.user.update({
+    await prisma.producer.update({
       where: {
         id: data.id,
       },
@@ -276,7 +284,7 @@ export const deleteUser = async (
   try {
     await clerkClient.users.deleteUser(id);
 
-    await prisma.user.delete({
+    await prisma.producer.delete({
       where: {
         id: id,
       },
@@ -290,19 +298,297 @@ export const deleteUser = async (
   }
 };
 
+//========ADMIN====
+export const createAdmin = async (
+  currentState: CurrentState,
+  data: AdminSchema
+) => {
+  try {
+    const user = await clerkClient.users.createUser({
+      emailAddress: [data.email],
+      password: "Bioms@2024",
+      username: data.username,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      publicMetadata: {
+        role: "admin", // Set the correct role here
+      },
+    });
+
+    await prisma.admin.create({
+      data: {
+        id: user.id,
+        email: data.email,
+        username: data.username,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        img: data.img || null,
+      },
+    });
+    // revalidatePath("/list/class"); // Uncomment if needed for revalidating paths
+    return { success: true, error: false };
+    console.log(user);
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const updateAdmin = async (
+  currentState: CurrentState,
+  data: UserSchema
+) => {
+  try {
+    await prisma.admin.update({
+      where: {
+        id: data.id,
+      },
+      data: {},
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteAdmin = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+  try {
+    await clerkClient.users.deleteUser(id);
+
+    await prisma.admin.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    // revalidatePath("/list/teachers");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+//========PRODUCER====
+export const createProducer = async (
+  currentState: CurrentState,
+  data: ProducerSchema
+) => {
+  try {
+    const user = await clerkClient.users.createUser({
+      emailAddress: [data.email],
+      password: process.env.TEMPORARY_PASSWORD,
+      username: data.username,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      publicMetadata: {
+        role: "producer", // Set the correct role here
+        companyId: data.companyId,
+      },
+    });
+
+    await prisma.producer.create({
+      data: {
+        id: user.id,
+        email: data.email,
+        username: data.username,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        companyId: data.companyId,
+        img: data.img || null,
+      },
+    });
+    // revalidatePath("/list/class"); // Uncomment if needed for revalidating paths
+    return { success: true, error: false };
+    console.log(user);
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const updateProducer = async (
+  currentState: CurrentState,
+  data: ProducerSchema
+) => {
+  try {
+    await prisma.producer.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        email: data.email,
+        username: data.username,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        companyId: data.companyId,
+        img: data.img || null,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteProducer = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+  try {
+    await clerkClient.users.deleteUser(id);
+
+    await prisma.producer.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    // revalidatePath("/list/teachers");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+//========STAFF====
+export const createStaff = async (
+  currentState: CurrentState,
+  data: StaffSchema
+) => {
+  try {
+    const user = await clerkClient.users.createUser({
+      emailAddress: [data.email],
+      password: "Bioms@2024",
+      username: data.username,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      publicMetadata: {
+        role: "staff", // Set the correct role here
+        companyId: data.companyId,
+      },
+    });
+
+    await prisma.staff.create({
+      data: {
+        id: user.id,
+        email: data.email,
+        username: data.username,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        companyId: data.companyId,
+        img: data.img || null,
+      },
+    });
+    // revalidatePath("/list/class"); // Uncomment if needed for revalidating paths
+    return { success: true, error: false };
+    console.log(user);
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const updateStaff = async (
+  currentState: CurrentState,
+  data: StaffSchema
+) => {
+  if (!data.id) {
+    return { success: false, error: true };
+  }
+  try {
+    const user = await clerkClient.users.updateUser(data.id, {
+      username: data.username,
+      firstName: data.firstName,
+      lastName: data.lastName,
+    });
+    await prisma.staff.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        email: data.email,
+        username: data.username,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        companyId: data.companyId,
+        img: data.img || null,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteStaff = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+  try {
+    await clerkClient.users.deleteUser(id);
+
+    await prisma.staff.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    // revalidatePath("/list/teachers");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
 //====================================================VOLUMES=====================================================
 
 //>>>>>CREATE<<<<<<<<
 // lib/actions.ts
-
 export const createVolume = async (
   currentState: CurrentState,
   data: VolumeSchema
 ) => {
   try {
-    const { sessionClaims } = auth();
-    const producerId = (sessionClaims?.metadata as { producerId?: string })
-      ?.producerId;
+    const { userId } = auth();
+
+    if (!userId) {
+      throw new Error("User ID not found in session.");
+    }
+
+    // Query the Producer model to get the companyId associated with the current user
+    const producer = await prisma.producer.findUnique({
+      where: { id: userId },
+      select: {
+        companyId: true, // Assuming companyId is a field in the Producer model
+      },
+    });
+
+    // Query the Staff model to get the companyId associated with the current user
+    const staff = await prisma.staff.findUnique({
+      where: { id: userId },
+      select: {
+        companyId: true, // Assuming companyId is a field in the Staff model
+      },
+    });
+
+    // Determine which user has the companyId (either producer or staff)
+    const companyId = producer?.companyId || staff?.companyId;
+
+    if (!companyId) {
+      throw new Error("Company ID not found for the user.");
+    }
 
     const today = new Date();
     let year = today.getFullYear();
@@ -323,11 +609,13 @@ export const createVolume = async (
         committedVolume: data.committedVolume,
         quarter: data.quarter,
         year: parseInt(data.year), // Use the dynamically calculated year
-        producerId,
+        companies: {
+          // Use the relation to assign the company
+          connect: [{ id: companyId }], // Connect the volume to the current user's company
+        },
       },
     });
-    console.log("Session Claims:", sessionClaims);
-    // revalidatePath("/list/teachers");
+
     return { success: true, error: false };
   } catch (err) {
     console.log(err);
@@ -404,23 +692,129 @@ export const getVolumeByQuarterYear = async (quarter: string, year: string) => {
     return null;
   }
 };
-export const createActualProduce = async (
+
+export const deleteVolume = async (
   currentState: CurrentState,
-  data: ActualProduceSchema
+  data: FormData
 ) => {
+  const id = data.get("id") as string;
   try {
-    // Fetch the volumeId based on a condition, for example, by using a unique identifier
-    const volume = await prisma.volume.findUnique({
-      where: { id: data.id }, // Assuming data.volumeId contains the identifier
+    const volumeId = parseInt(id);
+
+    // Start a transaction to ensure data consistency
+    await prisma.$transaction(async (prisma) => {
+      // Delete related data
+      await prisma.produce.deleteMany({
+        where: {
+          volumeId,
+        },
+      });
+
+      await prisma.sold.deleteMany({
+        where: {
+          volumeId,
+        },
+      });
+
+      // Add more delete operations if there are additional related tables
+      // Finally, delete the volume itself
+      await prisma.volume.delete({
+        where: {
+          id: volumeId,
+        },
+      });
     });
 
-    // Check if the volume was found
-    if (!volume) {
-      throw new Error("Volume not found");
-    }
+    // Optionally revalidate any paths
+    // revalidatePath("/list/subjects");
 
-    // Create the ActualProduce record with the found volumeId
-    await prisma.actualProduce.create({
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+// export const archiveVolume = async (
+//   currentState: CurrentState,
+//   data: FormData
+// ) => {
+//   const id = data.get("id") as string;
+//   try {
+//     await prisma.volume.update({
+//       where: {
+//         id: parseInt(id),
+//       },
+//       data: {
+//         archived: true,
+//       },
+//     });
+
+//     // revalidatePath("/list/subjects");
+//     return { success: true, error: false };
+//   } catch (err) {
+//     console.log(err);
+//     return { success: false, error: true };
+//   }
+// };
+
+export async function archiveVolume({
+  id,
+  archived,
+}: {
+  id: number;
+  archived: boolean;
+}) {
+  try {
+    await prisma.volume.update({
+      where: { id },
+      data: { archived }, // Toggle archived state
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating archive state:", error);
+    return { success: false, error: "Failed to update archive status." };
+  }
+}
+
+// export const getVolumeByQuarterYear = async (quarter: string, year: string) => {
+//   try {
+//     const volume = await prisma.volume.findFirst({
+//       where: {
+//         quarter: quarter,
+//         year: parseInt(year),
+//       },
+//     });
+
+//     return volume; // Returns the volume if it exists, otherwise returns null
+//   } catch (error) {
+//     console.error("Error fetching volume by quarter and year:", error);
+//     return null;
+//   }
+// };
+
+// ==========ACTUAL PRODUCTION/ PRODUCE ===============
+export const createProduce = async (
+  currentState: CurrentState,
+  data: ProduceSchema
+) => {
+  try {
+    const volume = await prisma.volume.findUnique({
+      where: { id: data.id },
+      select: {
+        id: true,
+        companies: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+
+    if (!volume) {
+      throw new Error("Volume not found.");
+    }
+    await prisma.produce.create({
       data: {
         volumeId: volume.id, // Assign the volumeId here
         actualProduction: data.actualProduction,
@@ -435,15 +829,51 @@ export const createActualProduce = async (
   }
 };
 
-export const deleteVolume = async (
+export const updateProduce = async (
+  currentState: CurrentState,
+  data: ProduceSchema
+) => {
+  try {
+    // Fetch the volumeId based on a condition, for example, by using a unique identifier
+    const volume = await prisma.volume.findUnique({
+      where: { id: data.id }, // Assuming data.volumeId contains the identifier
+    });
+
+    // Check if the volume was found
+    if (!volume) {
+      throw new Error("Volume not found");
+    }
+
+    // Create the ActualProduce record with the found volumeId
+    await prisma.produce.create({
+      data: {
+        volumeId: volume.id, // Assign the volumeId here
+        actualProduction: data.actualProduction,
+        month: data.month,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteProduce = async (
   currentState: CurrentState,
   data: FormData
 ) => {
   const id = data.get("id") as string;
+
+  // const { userId, sessionClaims } = auth();
+  // const role = (sessionClaims?.metadata as { role?: string })?.role;
+
   try {
-    await prisma.volume.delete({
+    await prisma.produce.delete({
       where: {
         id: parseInt(id),
+        // ...(role === "teacher" ? { lesson: { teacherId: userId! } } : {}),
       },
     });
 
@@ -455,8 +885,7 @@ export const deleteVolume = async (
   }
 };
 
-// lib/actions.ts
-
+//===========CHECK EXISTS ==========================
 export const checkProposedVolumeExists = async (
   quarter: string,
   year: number
@@ -490,7 +919,7 @@ export const checkExistingActualProduce = async (
         year: parseInt(year),
       },
       include: {
-        actualProduces: {
+        produces: {
           select: {
             month: true,
           },
@@ -506,26 +935,115 @@ export const checkExistingActualProduce = async (
   }
 };
 
-// // Function to handle CSV data insertion into Prisma
-// export const uploadCSVData = async (rows: any[]) => {
+//================VOLUME SOLD==============
+export const createSold = async (
+  currentState: CurrentState,
+  data: SoldSchema
+) => {
+  try {
+    // Fetch the volumeId based on a condition, for example, by using a unique identifier
+    const produce = await prisma.produce.findUnique({
+      where: { id: data.id }, // Assuming data.volumeId contains the identifier
+    });
+
+    // Check if the volume was found
+    if (!produce) {
+      throw new Error("Produce not found");
+    }
+
+    // Create the ActualProduce record with the found volumeId
+    await prisma.sold.create({
+      data: {
+        produceId: produce.id, // Assign the volumeId here
+        soldAmount: data.soldAmount,
+        mc: data.mc,
+        mro: data.mro,
+        consumerId: data.consumerId,
+        createdAt: new Date(),
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+// export const createSold = async (
+//   currentState: CurrentState,
+//   data: SoldSchema
+// ) => {
 //   try {
-//     await prisma.volume.createMany({
-//       data: rows.map((row) => ({
-//         date: new Date(), // Adjust based on your CSV data structure
-//         committedVolume: row.committedVolume,
-//         actualProduction: row.actualProduction,
-//         begInventory: row.begInventory,
-//         totalStock: row.totalStock,
-//         sold: row.sold,
-//         unsold: row.unsold,
-//       })),
+//     await prisma.sold.create({
+//       data: {
+//         soldAmount: data.soldAmount,
+//         mc: data.mc,
+//         mro: data.mro,
+//       },
 //     });
-//   } catch (error) {
-//     throw new Error("Error inserting data into database: " + error.message);
+
+//     // revalidatePath("/list/subjects");
+//     return { success: true, error: false };
+//   } catch (err) {
+//     console.log(err);
+//     return { success: false, error: true };
 //   }
 // };
 
-//====================Announcements==================================
+//update sold
+export const updateSold = async (
+  currentState: CurrentState,
+  data: SoldSchema
+) => {
+  try {
+    await prisma.sold.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        soldAmount: data.soldAmount,
+        mc: data.mc,
+        mro: data.mro,
+        createdAt: new Date(), // Set createdAt to the current date
+        consumerId: data.consumerId,
+      },
+    });
+
+    // revalidatePath("/list/subjects");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteSold = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+
+  // const { userId, sessionClaims } = auth();
+  // const role = (sessionClaims?.metadata as { role?: string })?.role;
+
+  try {
+    await prisma.sold.delete({
+      where: {
+        id: parseInt(id),
+        // ...(role === "teacher" ? { lesson: { teacherId: userId! } } : {}),
+      },
+    });
+
+    // revalidatePath("/list/subjects");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+//===============Lift=======================
+
 export const createAnnouncement = async (
   currentState: CurrentState,
   data: AnnouncementSchema
@@ -604,6 +1122,104 @@ export const updateAnnouncement = async (
 };
 
 export const deleteAnnouncement = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+
+  // const { userId, sessionClaims } = auth();
+  // const role = (sessionClaims?.metadata as { role?: string })?.role;
+
+  try {
+    await prisma.announcement.delete({
+      where: {
+        id: parseInt(id),
+        // ...(role === "teacher" ? { lesson: { teacherId: userId! } } : {}),
+      },
+    });
+
+    // revalidatePath("/list/subjects");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+//=================LIFT====================
+
+export const createLift = async (
+  currentState: CurrentState,
+  data: LiftSchema
+) => {
+  try {
+    const sold = await prisma.sold.findUnique({
+      where: { id: data.id }, // Assuming data.volumeId contains the identifier
+    });
+
+    // Check if the volume was found
+    if (!sold) {
+      throw new Error("Sold not found");
+    }
+
+    await prisma.lift.create({
+      data: {
+        liftVolume: data.liftVolume,
+        region: data.region,
+        remark: data.remark,
+        soldId: sold.id,
+      },
+    });
+
+    // revalidatePath("/list/subjects");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const updateLift = async (
+  currentState: CurrentState,
+  data: LiftSchema
+) => {
+  // const { userId, sessionClaims } = auth();
+  // const role = (sessionClaims?.metadata as { role?: string })?.role;
+
+  try {
+    // if (role === "teacher") {
+    //   const teacherLesson = await prisma.lesson.findFirst({
+    //     where: {
+    //       teacherId: userId!,
+    //       id: data.lessonId,
+    //     },
+    //   });
+
+    //   if (!teacherLesson) {
+    //     return { success: false, error: true };
+    //   }
+    // }
+
+    await prisma.lift.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        liftVolume: data.liftVolume,
+        region: data.region,
+        remark: data.remark,
+      },
+    });
+
+    // revalidatePath("/list/subjects");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteLift = async (
   currentState: CurrentState,
   data: FormData
 ) => {
@@ -732,3 +1348,66 @@ export const deleteEvent = async (
     return { success: false, error: true };
   }
 };
+
+//========send mail===============
+
+export const inviteUser = async (
+  currentState: CurrentState,
+  data: InviteSchema
+) => {
+  try {
+    const user = await clerkClient.users.createUser({
+      firstName: data.firstName,
+      lastName: data.lastName,
+      username: data.username,
+      password: data.password,
+      emailAddress: [data.email],
+      publicMetadata: {
+        role: "producer", // Set the correct role here
+      },
+    });
+
+    await prisma.producer.create({
+      data: {
+        id: user.id,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        img: data.img || null,
+      },
+    });
+    // revalidatePath("/list/class"); // Uncomment if needed for revalidating paths
+    return { success: true, error: false };
+    // console.log(user);
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteInvite = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+
+  // const { userId, sessionClaims } = auth();
+  // const role = (sessionClaims?.metadata as { role?: string })?.role;
+
+  try {
+    await prisma.event.delete({
+      where: {
+        id: parseInt(id),
+        // ...(role === "teacher" ? { lesson: { teacherId: userId! } } : {}),
+      },
+    });
+
+    // revalidatePath("/list/subjects");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+//=======FETCH =====

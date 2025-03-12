@@ -24,10 +24,17 @@ const EventListPage = async ({
     {
       header: "Title",
       accessor: "title",
+      className: "hidden md:table-cell p-4",
+    },
+    {
+      header: "Description",
+      accessor: "description",
+      className: "hidden md:table-cell",
     },
     {
       header: "Date",
       accessor: "date",
+      className: "hidden md:table-cell",
     },
 
     {
@@ -53,11 +60,11 @@ const EventListPage = async ({
   const renderRow = (item: EventList) => (
     <tr
       key={item.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
+      className="border-b text-sm border-gray-200  font-medium hover:bg-gray-100"
     >
-      <td className="flex items-center p-2 gap-2 ">{item.title}</td>
-      <td className="flex items-center p-2 gap-2 ">{item.description}</td>
-  
+      <td className="flex items-center p-4 gap-2 ">{item.title}</td>
+      <td className="hidden md:table-cell">{item.description}</td>
+
       <td className="hidden md:table-cell">
         {new Intl.DateTimeFormat("en-US").format(item.startTime)}
       </td>
@@ -87,7 +94,7 @@ const EventListPage = async ({
       </td>
     </tr>
   );
-  
+
   const { page, ...queryParams } = searchParams;
 
   const p = page ? parseInt(page) : 1;
@@ -136,10 +143,16 @@ const EventListPage = async ({
   ]);
 
   return (
-    <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
+    <div className="bg-white p-4 flex-1 border">
       {/* TOP */}
       <div className="flex items-center justify-between">
-        <h1 className="hidden md:block text-lg font-semibold">All Events</h1>
+        {/* TOP */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
+          <div className="mb-4 md:mb-0">
+            <h1 className="text-2xl font-bold text-gray-800">All Events</h1>
+            <p className="text-sm text-gray-500">View and manage events</p>
+          </div>
+        </div>
         <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
           <TableSearch />
           <div className="flex items-center gap-4 self-end">

@@ -22,8 +22,8 @@ const MenuLink = ({ href, icon, label }: MenuLinkProps) => {
       href={href}
       className={`flex items-center justify-center lg:justify-start gap-4 py-2 md:px-2 rounded-md ${
         isActive
-          ? "bg-lamaSkyLight text-blue-600"
-          : "text-gray-500 hover:bg-lamaSkyLight"
+          ? "bg-biomsSkyLight text-blue-600"
+          : "text-gray-500 hover:bg-biomsSkyLight"
       }`}
     >
       <Image src={icon} alt={label} width={20} height={20} />

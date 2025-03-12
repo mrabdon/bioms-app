@@ -15,7 +15,7 @@ const ConsumerForm = ({
   data,
   setOpen,
 }: {
-  type: "create" | "update" | "createActual";
+  type: "create" | "update" |  "invite" |"createProduce" | "createSold"| "createLift";
   data?: any;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }) => {

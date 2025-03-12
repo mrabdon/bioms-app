@@ -15,7 +15,7 @@ const menuItems = [
         href:
           role === "admin"
             ? "/admin"
-            : role === "producer"
+            : role === "/producer"
             ? "/producer"
             : role === "staff"
             ? "/staff"
@@ -39,14 +39,20 @@ const menuItems = [
         icon: "/user.png",
         label: "User Management",
         href: "/list/users",
-        visible: ["admin", "producer"],
+        visible: ["admin"],
+      },
+      {
+        icon: "/user.png",
+        label: "User Management",
+        href: "/list/producer_staffs",
+        visible: ["producer"],
       },
 
       {
         icon: "/volume.png",
         label: "Volumes",
         href: "/list/volumes",
-        visible: ["producer"],
+        visible: ["admin", "producer", "staff"],
       },
 
       {
@@ -69,23 +75,23 @@ const menuItems = [
       },
     ],
   },
-  {
-    title: "OTHER",
-    items: [
-      {
-        icon: "/profile.png",
-        label: "Profile",
-        href: "/profile",
-        visible: ["admin", "producer", "staff"],
-      },
-      {
-        icon: "/setting.png",
-        label: "Change Password",
-        href: "/change",
-        visible: ["admin", "producer", "staff"],
-      },
-    ],
-  },
+  // {
+  //   title: "OTHER",
+  //   items: [
+  //     {
+  //       icon: "/profile.png",
+  //       label: "Profile",
+  //       href: "/profile",
+  //       visible: ["admin", "producer", "staff"],
+  //     },
+  //     {
+  //       icon: "/setting.png",
+  //       label: "Change Password",
+  //       href: "/change",
+  //       visible: ["admin", "producer", "staff"],
+  //     },
+  //   ],
+  // },
 ];
 
 const Menu = async () => {
@@ -112,17 +118,17 @@ const Menu = async () => {
         </div>
       ))}
       {/* Logout Button */}
-      <div className="flex flex-col gap-4 my-2">
+      {/* <div className="flex flex-col gap-4 my-2 ">
         <SignOutButton>
           <button
-            className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-lamaSkyLight"
+            className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-biomsSkyLight"
             type="submit"
           >
             <Image src="/logout.png" alt="Logout" width={20} height={20} />
             <span className="hidden lg:block">Logout</span>
           </button>
         </SignOutButton>
-      </div>
+      </div> */}
     </div>
   );
 };

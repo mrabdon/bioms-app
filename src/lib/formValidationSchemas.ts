@@ -1,8 +1,8 @@
 import { EmailAddress } from "@clerk/nextjs/server";
 import { ZodError, z } from "zod";
 
-//======================== PRODUCER ==========================
-export const producerSchema = z.object({
+//======================== COMPANY ==========================
+export const companySchema = z.object({
   id: z.string(), // Define 'id' as string
   name: z.string().min(1, { message: "name is required!" }),
   alias: z.string().min(1, { message: "alias is required!" }),
@@ -10,7 +10,7 @@ export const producerSchema = z.object({
   feedstock: z.string().optional(),
 });
 
-export type ProducerSchema = z.infer<typeof producerSchema>;
+export type CompanySchema = z.infer<typeof companySchema>;
 
 // =======================CONSUMER==================================
 export const consumerSchema = z.object({
@@ -22,14 +22,6 @@ export type ConsumerSchema = z.infer<typeof consumerSchema>;
 
 //===============================USERS===============================
 
-// Async username validation
-// async function checkUsernameExists(username: string): Promise<boolean> {
-//   const response = await fetch(
-//     `/list/users/check-username?username=${username}`
-//   );
-//   const data = await response.json();
-//   return data.exists; // Assuming your API responds with { exists: true/false }
-// }
 export const userSchema = z.object({
   id: z.string().optional(),
   email: z.string().email({ message: "Invalid email address!" }),
@@ -41,66 +33,41 @@ export const userSchema = z.object({
 
 export type UserSchema = z.infer<typeof userSchema>;
 
-// // For detailed error mapping from Clerk
-// const clerkErrors = {
-//   form_identifier_exists: "That username is taken. Please try another.",
-//   form_password_length_too_short: "Passwords must be 8 characters or more.",
-// };
+//=======ADMIN=====
+export const adminSchema = z.object({
+  id: z.string().optional(),
+  email: z.string().email({ message: "Invalid email address!" }),
+  username: z.string().min(2, { message: "Username is required!" }),
+  firstName: z.string().min(1, { message: "First name is required!" }),
+  lastName: z.string().min(1, { message: "Last name is required!" }),
+  img: z.string().optional(),
+});
 
-// const validateUserInput = (input) => {
-//   try {
-//     userSchema.parse(input);
-//     return { success: true, errors: [] };
-//   } catch (zodError) {
-//     // Map Zod errors
-//     return {
-//       success: false,
-//       errors: zodError.errors.map((err) => ({
-//         field: err.path[0],
-//         message: err.message,
-//       })),
-//     };
-//   }
-// };
-// const handleClerkErrors = (clerkError) => {
-//   return clerkError.errors.map((error) => ({
-//     field: error.code === "form_identifier_exists" ? "username" : "password",
-//     message: clerkErrors[error.code] || error.message,
-//   }));
-// };
+export type AdminSchema = z.infer<typeof adminSchema>;
+//=======PRODUCER=====
+export const producerSchema = z.object({
+  id: z.string().optional(),
+  email: z.string().email({ message: "Invalid email address!" }),
+  username: z.string().min(2, { message: "Username is required!" }),
+  firstName: z.string().min(1, { message: "First name is required!" }),
+  lastName: z.string().min(1, { message: "Last name is required!" }),
+  companyId: z.string().min(1, { message: "Company name is required!" }),
+  img: z.string().optional(),
+});
 
-// // Example Usage
-// const clerkResponse = {
-//   clerkError: true,
-//   errors: [
-//     {
-//       code: "form_identifier_exists",
-//       message: "That username is taken. Please try another.",
-//       longMessage: "That username is taken. Please try another.",
-//       meta: {},
-//     },
-//     {
-//       code: "form_password_length_too_short",
-//       message: "Passwords must be 8 characters or more.",
-//       longMessage: "Passwords must be 8 characters or more.",
-//       meta: {},
-//     },
-//   ],
-// };
+export type ProducerSchema = z.infer<typeof producerSchema>;
+//=======STAFF=====
+export const staffSchema = z.object({
+  id: z.string().optional(),
+  email: z.string().email({ message: "Invalid email address!" }),
+  username: z.string().min(2, { message: "Username is required!" }),
+  firstName: z.string().min(1, { message: "First name is required!" }),
+  lastName: z.string().min(1, { message: "Last name is required!" }),
+  companyId: z.string().min(1, { message: "Company name is required!" }),
+  img: z.string().optional(),
+});
 
-// if (clerkResponse.clerkError) {
-//   const clerkHandledErrors = handleClerkErrors(clerkResponse);
-//   console.log(clerkHandledErrors);
-//   // Use `clerkHandledErrors` to show messages in your UI
-// }
-
-//VOLUME
-// export const volumeSchema = z.object({
-//   id: z.coerce.number().optional(),
-//   committedVolume: z.coerce
-//     .number()
-//     .min(1, { message: "Committed volume is required" }),
-// });
+export type StaffSchema = z.infer<typeof staffSchema>;
 
 //===========================VOLUMES ====================================
 export const volumeSchema = z.object({
@@ -108,22 +75,56 @@ export const volumeSchema = z.object({
   committedVolume: z.coerce.number().optional(),
   quarter: z.string(),
   year: z.string(),
+  archived: z.string().optional(),
 });
 
 export type VolumeSchema = z.infer<typeof volumeSchema>;
 
-//===========================Actual Produce ========================
-
-export const actualProduceSchema = z.object({
+//====================SOLD TO ===================
+export const soldSchema = z.object({
   id: z.coerce.number().optional(),
   volumeId: z.coerce.number().optional(),
-  quarter: z.string(),
-  year: z.string(),
-  month: z.string(),
-  actualProduction: z.coerce.number().optional(),
+  soldAmount: z.coerce.number().min(1, { message: "Sold amount is required!" }),
+  mc: z.coerce.number().min(1, { message: "MC value is required!" }),
+  mro: z.coerce.number().min(1, { message: "MRO value is required!" }),
+  consumerId: z.string({ message: "Oil Company is required!" }),
+  produceId: z.coerce.number().optional(),
+  producerId: z.coerce.number().optional(),
+  remainingActualProduce: z.coerce.number().optional(),
+
 });
 
-export type ActualProduceSchema = z.infer<typeof actualProduceSchema>;
+export type SoldSchema = z.infer<typeof soldSchema>;
+
+//===========================Actual Produce ========================
+
+export const produceSchema = z.object({
+  id: z.coerce.number().optional(),
+  volumeId: z.coerce.number().optional(),
+  quarter: z.string().optional(),
+  year: z.string().optional(),
+  month: z.string(),
+  remainingCommittedVolume: z.coerce.number().optional(),
+  actualProduction: z.coerce.number().optional(),
+  consumerId: z.coerce.number().optional(),
+  companyId: z.coerce.string().optional(),
+  
+});
+
+export type ProduceSchema = z.infer<typeof produceSchema>;
+
+//==================LIFT SCHEMA ================
+export const liftSchema = z.object({
+  id: z.coerce.number().optional(),
+  liftVolume: z.coerce.number(),
+  region: z.string().min(1, { message: "Region is required!" }),
+  remark: z.string(),
+  soldId: z.coerce.number().optional(),
+  remainingSoldVolume: z.coerce.number().optional(),
+  
+});
+
+export type LiftSchema = z.infer<typeof liftSchema>;
 
 //==================ANNOUNCEMENT================
 export const announcementSchema = z.object({
@@ -147,3 +148,43 @@ export const eventSchema = z.object({
 });
 
 export type EventSchema = z.infer<typeof eventSchema>;
+
+//===========MAIL=============
+export const mailFormSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Invalid email address"),
+});
+
+export type MailFormSchema = z.infer<typeof mailFormSchema>;
+
+export const inviteSchema = z.object({
+  id: z.string().optional(),
+  email: z.string().email({ message: "Invalid email address!" }),
+  username: z.string().min(2, { message: "Username is required!" }),
+  password: z.string().min(1, { message: "First name is required!" }),
+  firstName: z.string().min(1, { message: "First name is required!" }),
+  lastName: z.string().min(1, { message: "Last name is required!" }),
+  img: z.string().optional(),
+});
+
+export type InviteSchema = z.infer<typeof inviteSchema>;
+
+//=====Register Form=====
+export const registerSchema = z.object({
+  id: z.string().optional(),
+  username: z
+    .string()
+    .min(3, { message: "Username must be at least 3 characters long!" })
+    .max(20, { message: "Username must be at most 20 characters long!" }),
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters long!" })
+    .optional()
+    .or(z.literal("")),
+  producerName: z.string().min(1, { message: "Producer name is required!" }),
+  img: z.string().optional(),
+  companyId: z.string().min(1, { message: "Company name is required!" }),
+});
+
+export type RegisterSchema = z.infer<typeof registerSchema>;

@@ -45,3 +45,35 @@ export const getRelativeTime = (date: Date) => {
   return `${diffInWeeks} week${diffInWeeks === 1 ? "" : "s"} ago`;
 };
 
+export const getValidQuarter = (testDate?: Date) => {
+  const date = testDate ?? new Date(); // Use testDate if provided, otherwise use current date
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+
+  if (month === 1 && day <= 10) return "Q2";
+  if (month === 4 && day <= 10) return "Q3";
+  if (month === 7 && day <= 10) return "Q4";
+  if (month === 9 && day <= 10) return "Q1";
+
+  return null;
+};
+
+export const getValidYear = (testDate?: Date) => {
+  const date = testDate ?? new Date(); // Use testDate if provided, otherwise use current date
+  const currentYear = date.getFullYear();
+  const nextYear = currentYear + 1;
+
+  return getValidQuarter(date)?.startsWith("Q1")
+    ? `${nextYear}`
+    : `${currentYear}`;
+};
+
+
+// VOLUME FORM VALIDATION
+
+/*
+1. FILTER COMPANY ID
+2. CHECK IF THERE IS EXISTING VOLUME, IF NOT ALLOW CREATE
+3. VALIDATE DATE IF 1ST MONTH OF THE QUARTER (1-10 DAYS)
+4. CHECK VALID QUARTER AND YEAR AS PER TODAY
+*/

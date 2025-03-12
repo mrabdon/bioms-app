@@ -5,12 +5,12 @@ import Tab from "./Tab";
 
 const tabsData = [
   { label: "All Volumes", value: "volumes", link: "/list/reports" },
-  { label: "Sales Analysis", value: "sales", link: "/list/reports/sales" },
-  {
-    label: "Production Analysis",
-    value: "production",
-    link: "/list/reports/production",
-  },
+  // { label: "Sales Analysis", value: "sales", link: "/list/reports/sales" },
+  // {
+  //   label: "Production Analysis",
+  //   value: "production",
+  //   link: "/list/reports/production",
+  // },
 ];
 
 const TabListContainer = async () => {

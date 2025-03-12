@@ -3,6 +3,8 @@ import { routeAccessMap } from "./lib/settings";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+// Define public routes that don’t require authentication
+
 const matchers = Object.keys(routeAccessMap).map((route) => ({
   matcher: createRouteMatcher([route]),
   allowedRoles: routeAccessMap[route],

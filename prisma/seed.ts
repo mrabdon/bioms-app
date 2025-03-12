@@ -3,8 +3,8 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  //PRODUCER
-  await prisma.producer.create({
+  //company
+  await prisma.company.create({
     data: {
       id: "2024000001",
       name: "San Carlos Bioenergy, Inc.",
@@ -14,7 +14,7 @@ async function main() {
       createdAt: "2024-11-10T16:00:00+08:00",
     },
   });
-  await prisma.producer.create({
+  await prisma.company.create({
     data: {
       id: "2024000002",
       name: "Leyte Agri Corp.",
@@ -24,7 +24,7 @@ async function main() {
       createdAt: "2024-11-10T16:00:00+08:00",
     },
   });
-  await prisma.producer.create({
+  await prisma.company.create({
     data: {
       id: "2024000003",
       name: "Roxol Bioenergy Corp.",
@@ -34,7 +34,7 @@ async function main() {
       createdAt: "2024-11-10T16:00:00+08:00",
     },
   });
-  await prisma.producer.create({
+  await prisma.company.create({
     data: {
       id: "2024000004",
       name: "Green Future Innovations, Inc.",
@@ -44,7 +44,7 @@ async function main() {
       createdAt: "2024-11-10T16:00:00+08:00",
     },
   });
-  await prisma.producer.create({
+  await prisma.company.create({
     data: {
       id: "2024000005",
       name: "Balayan Distillery, Incorporated",
@@ -54,7 +54,7 @@ async function main() {
       createdAt: "2024-11-10T16:00:00+08:00",
     },
   });
-  await prisma.producer.create({
+  await prisma.company.create({
     data: {
       id: "2024000006",
       name: "Far East Alcohol Corporation",
@@ -64,7 +64,7 @@ async function main() {
       createdAt: "2024-11-10T16:00:00+08:00",
     },
   });
-  await prisma.producer.create({
+  await prisma.company.create({
     data: {
       id: "2024000007",
       name: "Kooll Company Inc.",
@@ -74,7 +74,7 @@ async function main() {
       createdAt: "2024-11-10T16:00:00+08:00",
     },
   });
-  await prisma.producer.create({
+  await prisma.company.create({
     data: {
       id: "2024000008",
       name: "Universal Robina Corporation",
@@ -84,7 +84,7 @@ async function main() {
       createdAt: "2024-11-10T16:00:00+08:00",
     },
   });
-  await prisma.producer.create({
+  await prisma.company.create({
     data: {
       id: "2024000009",
       name: "Absolut Distillers Inc.",
@@ -94,7 +94,7 @@ async function main() {
       createdAt: "2024-11-10T16:00:00+08:00",
     },
   });
-  await prisma.producer.create({
+  await prisma.company.create({
     data: {
       id: "2024000010",
       name: "Progreen Agricorp Inc. - Nasugbu",
@@ -104,7 +104,7 @@ async function main() {
       createdAt: "2024-11-10T16:00:00+08:00",
     },
   });
-  await prisma.producer.create({
+  await prisma.company.create({
     data: {
       id: "2024000011",
       name: "Progreen Agricorp Inc. - Balayan",
@@ -114,7 +114,7 @@ async function main() {
       createdAt: "2024-11-10T16:00:00+08:00",
     },
   });
-  await prisma.producer.create({
+  await prisma.company.create({
     data: {
       id: "2024000012",
       name: "Victorias Milling Company, Inc.",
@@ -124,7 +124,7 @@ async function main() {
       createdAt: "2024-11-10T16:00:00+08:00",
     },
   });
-  await prisma.producer.create({
+  await prisma.company.create({
     data: {
       id: "2024000013",
       name: "Asian Alcohol Corporation",

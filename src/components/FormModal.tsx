@@ -4,9 +4,17 @@ import {
   deleteAnnouncement,
   deleteConsumer,
   deleteEvent,
-  deleteProducer,
+  deleteLift,
+  deleteProduce,
+  deleteCompany,
+  deleteSold,
   deleteUser,
   deleteVolume,
+  deleteInvite,
+  deleteAdmin,
+  deleteProducer,
+  deleteStaff,
+  archiveVolume,
 } from "@/lib/actions";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -18,14 +26,46 @@ import { FormContainerProps } from "./FormContainer";
 
 const deleteActionMap = {
   volume: deleteVolume,
-  producer: deleteProducer,
+  company: deleteCompany,
   consumer: deleteConsumer,
   user: deleteUser,
+  admin: deleteAdmin,
+  producer: deleteProducer,
+  staff: deleteStaff,
   announcement: deleteAnnouncement,
   event: deleteEvent,
-  volumeActualProduce: deleteEvent,
+  produce: deleteProduce,
+  sold: deleteSold,
+  lift: deleteLift,
+  invite: deleteInvite,
+  archive: archiveVolume,
+};
+const archiveActionMap = {
+  volume: deleteVolume,
+  company: deleteCompany,
+  consumer: deleteConsumer,
+  user: deleteUser,
+  admin: deleteAdmin,
+  producer: deleteProducer,
+  staff: deleteStaff,
+  announcement: deleteAnnouncement,
+  event: deleteEvent,
+  produce: deleteProduce,
+  sold: deleteSold,
+  lift: deleteLift,
+  invite: deleteInvite,
+  archive: archiveVolume,
 };
 const UserForm = dynamic(() => import("./forms/UserForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+const AdminForm = dynamic(() => import("./forms/AdminForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+const ProducerForm = dynamic(() => import("./forms/ProducerForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+const StaffForm = dynamic(() => import("./forms/StaffForm"), {
   loading: () => <h1>Loading...</h1>,
 });
 
@@ -33,7 +73,7 @@ const VolumeForm = dynamic(() => import("./forms/VolumeForm"), {
   loading: () => <h1>Loading...</h1>,
 });
 
-const ProducerForm = dynamic(() => import("./forms/ProducerForm"), {
+const CompanyForm = dynamic(() => import("./forms/CompanyForm"), {
   loading: () => <h1>Loading...</h1>,
 });
 
@@ -47,30 +87,37 @@ const AnnouncementForm = dynamic(() => import("./forms/AnnouncementForm"), {
 const EventForm = dynamic(() => import("./forms/EventForm"), {
   loading: () => <h1>Loading...</h1>,
 });
-const VolumeActualProduceForm = dynamic(
-  () => import("./forms/VolumeActualProduceForm"),
-  {
-    loading: () => <h1>Loading...</h1>,
-  }
-);
-
-// const VolumeActualProduceForm = dynamic(
-//   () => import("./forms/VolumeActualProduceForm"),
-//   {
-//     loading: () => <h1>Loading...</h1>,
-//   }
-// );
-
-// const StudentForm = dynamic(() => import("./forms/StudentForm"), {
+const ProduceForm = dynamic(() => import("./forms/ProduceForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+const SoldForm = dynamic(() => import("./forms/SoldForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+const LiftForm = dynamic(() => import("./forms/LiftForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+const InviteForm = dynamic(() => import("./forms/InviteForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+// const ArchiveForm = dynamic(() => import("./forms/ArchiveForm"), {
 //   loading: () => <h1>Loading...</h1>,
 // });
 
 const forms: {
   [key: string]: (
     setOpen: Dispatch<SetStateAction<boolean>>,
-    type: "create" | "update" | "createActual",
+    type:
+      | "create"
+      | "update"
+      | "invite"
+      | "createProduce"
+      | "createSold"
+      | "createLift",
     data?: any,
     relatedData?: any
+    // sendMail?: (
+    //   formData: MailFormData
+    // ) => Promise<{ success: boolean; error: string | null }>
   ) => JSX.Element;
 } = {
   user: (setOpen, type, data, relatedData) => (
@@ -81,24 +128,32 @@ const forms: {
       relatedData={relatedData}
     />
   ),
-  volume: (setOpen, type, data, relatedData) => (
-    <VolumeForm
+  admin: (setOpen, type, data, relatedData) => (
+    <AdminForm
       type={type}
       data={data}
       setOpen={setOpen}
-      // relatedData={relatedData}
-    />
-  ),
-  volumeActualProduce: (setOpen, type, data, relatedData) => (
-    <VolumeActualProduceForm
-      type={type}
-      data={data}
-      setOpen={setOpen}
-      // relatedData={relatedData}
+      relatedData={relatedData}
     />
   ),
   producer: (setOpen, type, data, relatedData) => (
     <ProducerForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData}
+    />
+  ),
+  staff: (setOpen, type, data, relatedData) => (
+    <StaffForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData}
+    />
+  ),
+  company: (setOpen, type, data, relatedData) => (
+    <CompanyForm
       type={type}
       data={data}
       setOpen={setOpen}
@@ -112,6 +167,38 @@ const forms: {
       data={data}
       setOpen={setOpen}
       // relatedData={relatedData}
+    />
+  ),
+  volume: (setOpen, type, data, relatedData) => (
+    <VolumeForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      // relatedData={relatedData}
+    />
+  ),
+  produce: (setOpen, type, data, relatedData) => (
+    <ProduceForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData}
+    />
+  ),
+  sold: (setOpen, type, data, relatedData) => (
+    <SoldForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData}
+    />
+  ),
+  lift: (setOpen, type, data, relatedData) => (
+    <LiftForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData}
     />
   ),
   announcement: (setOpen, type, data, relatedData) => (
@@ -130,6 +217,14 @@ const forms: {
       // relatedData={relatedData}
     />
   ),
+  invite: (setOpen, type, data, relatedData) => (
+    <InviteForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData}
+    />
+  ),
 };
 
 const FormModal = ({
@@ -145,11 +240,19 @@ const FormModal = ({
       ? "bg-purple-500"
       : type === "update"
       ? "bg-green-500"
-      : type === "createActual"
-      ? "bg-green-500"
+      : type === "invite"
+      ? "bg-purple-500"
+      : type === "createProduce"
+      ? "bg-blue-500"
+      : type === "createSold"
+      ? "bg-pink-500"
+      : type === "createLift"
+      ? "bg-purple-500"
       : type === "delete"
       ? "bg-red-400"
-      : "bg-lamaPurple";
+      : type === "archive"
+      ? "bg-purple-500"
+      : "bg-biomsPurple";
 
   const typeTitle =
     type === "delete"
@@ -158,14 +261,25 @@ const FormModal = ({
       ? "Create"
       : type === "update"
       ? "Update"
-      : type === "createActual"
+      : type === "createProduce"
       ? "+ Actual Produce"
+      : type === "createSold"
+      ? "Sell"
+      : type === "createLift"
+      ? "Lift"
+      : type === "invite"
+      ? "Invite"
+      : type === "archive"
+      ? "Archive"
       : "Del";
 
   const [open, setOpen] = useState(false);
 
   const Form = () => {
-    const [state, formAction] = useFormState(deleteActionMap[table], {
+    const action =
+      type === "delete" ? deleteActionMap[table] : archiveActionMap[table];
+
+    const [state, formAction] = useFormState(action, {
       success: false,
       error: false,
     });
@@ -174,7 +288,7 @@ const FormModal = ({
 
     useEffect(() => {
       if (state.success) {
-        toast(`${table} has been deleted!`);
+        toast.success(`${table} has been deleted!`);
         setOpen(false);
         router.refresh();
       }
@@ -202,7 +316,58 @@ const FormModal = ({
           Delete
         </button>
       </form>
-    ) : type === "create" || type === "update" || type === "createActual" ? (
+    ) : type === "archive" && id ? (
+      <form
+        action={async (formData) => {
+          await archiveVolume({
+            id: Number(id), // Ensure id is a number
+            archived: !data?.archived, // Toggle archive state
+          });
+
+          toast(
+            `${table} has been ${data?.archived ? "unarchived" : "archived"}!`
+          );
+          setOpen(false);
+          router.refresh();
+        }}
+        className="p-4 flex flex-col gap-4 items-center"
+      >
+        <input type="hidden" name="id" value={Number(id)} />
+        <input
+          type="hidden"
+          name="archived"
+          value={(!data?.archived).toString()}
+        />
+
+        <span className="text-center font-medium">
+          Are you sure you want to {data?.archived ? "unarchive" : "archive"}{" "}
+          this {table}?
+        </span>
+
+        <div className="flex gap-4">
+          <button
+            type="submit"
+            className={`py-2 px-4 rounded-md border-none w-max ${
+              data?.archived ? "bg-green-600" : "bg-orange-500"
+            } text-white`}
+          >
+            {data?.archived ? "Unarchive" : "Archive"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="bg-gray-500 text-white py-2 px-4 rounded-md border-none w-max"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    ) : type === "create" ||
+      type === "update" ||
+      type === "invite" ||
+      type === "createProduce" ||
+      type === "createSold" ||
+      type === "createLift" ? (
       forms[table](setOpen, type, data, relatedData)
     ) : (
       "Form not found!"

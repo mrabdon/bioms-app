@@ -10,35 +10,42 @@ import {
   useCallback,
   useMemo,
 } from "react";
-import {
-  actualProduceSchema,
-  ActualProduceSchema,
-} from "@/lib/formValidationSchemas";
+import { produceSchema, ProduceSchema } from "@/lib/formValidationSchemas";
 import InputField from "../InputField";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { useFormState } from "react-dom";
-import { createActualProduce, createVolume, updateVolume } from "@/lib/actions";
+import { createProduce, updateProduce } from "@/lib/actions";
 
-const VolumeActualProduceForm = ({
+const ProduceForm = ({
   type,
   data,
+  remainingVolume,
+  existingVolumes,
   setOpen,
 }: {
-  type: "create" | "update" | "createActual";
+  type:
+    | "create"
+    | "update"
+    | "invite"
+    | "createProduce"
+    | "createSold"
+    | "createLift";
   data?: any;
+  remainingVolume: number;
+  existingVolumes?: { quarter: string; year: string }[];
   setOpen: Dispatch<SetStateAction<boolean>>;
 }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ActualProduceSchema>({
-    resolver: zodResolver(actualProduceSchema),
+  } = useForm<ProduceSchema>({
+    resolver: zodResolver(produceSchema),
   });
 
   const [state, formAction] = useFormState(
-    type === "createActual" ? createActualProduce : createActualProduce,
+    type === "createProduce" ? createProduce : updateProduce,
     {
       success: false,
       error: false,
@@ -48,9 +55,9 @@ const VolumeActualProduceForm = ({
   const [validQuarter, setValidQuarter] = useState<string | null>(null);
   const [validYear, setValidYear] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
-
+  const [errorMessage, setErrorMessage] = useState<string>(""); // Store validation error message
   // Memoize testDate to prevent it from being recreated on every render
-  const testDate = useMemo(() => new Date(2025, 3, 1), []); // Example: January 14, 2024
+  const testDate = new Date(2025, 9, 1); // Example: January 14, 2024
 
   // Wrap getValidQuarter in useCallback to avoid it being recreated on every render
   const getValidQuarter = useCallback(() => {
@@ -87,6 +94,23 @@ const VolumeActualProduceForm = ({
     return `${currentYear}`; // Otherwise, return the current year as a string
   }, [getValidQuarter, testDate]);
 
+  // Function to generate month options based on the quarter
+  const getMonthOptions = () => {
+    if (data?.quarter === "Q1") {
+      return ["January", "February", "March"];
+    }
+    if (data?.quarter === "Q2") {
+      return ["April", "May", "June"];
+    }
+    if (data?.quarter === "Q3") {
+      return ["July", "August", "September"];
+    }
+    if (data?.quarter === "Q4") {
+      return ["October", "November", "December"];
+    }
+    return [];
+  };
+
   // In useEffect
   useEffect(() => {
     setValidQuarter(getValidQuarter());
@@ -109,27 +133,10 @@ const VolumeActualProduceForm = ({
     }
   }, [state, router, type, setOpen]);
 
-  // Function to generate month options based on the quarter
-  const getMonthOptions = () => {
-    if (data?.quarter === "Q1") {
-      return ["January", "February", "March"];
-    }
-    if (data?.quarter === "Q2") {
-      return ["April", "May", "June"];
-    }
-    if (data?.quarter === "Q3") {
-      return ["July", "August", "September"];
-    }
-    if (data?.quarter === "Q4") {
-      return ["October", "November", "December"];
-    }
-    return [];
-  };
-
   return (
     <form className="flex flex-col gap-8" onSubmit={onSubmit}>
       <h1 className="text-xl font-semibold">
-        {type === "createActual"
+        {type === "createProduce"
           ? "Create Actual Produce Volume"
           : "Update Actual Produce Volume"}
       </h1>
@@ -149,50 +156,33 @@ const VolumeActualProduceForm = ({
       </div>
 
       {/* Conditional Quarter Selection */}
-      {validQuarter ? (
-        <div className="flex flex-col gap-2">
-          <label className="font-medium text-sm">Quarter</label>
-          <select
-            {...register("quarter")}
-            defaultValue={data?.quarter}
-            className="p-2 border rounded-md"
-          >
-            <option value={validQuarter}>{validQuarter}</option>
-          </select>
-          {errors?.quarter && (
-            <span className="text-red-500 text-xs">
-              {errors.quarter.message}
-            </span>
-          )}
-        </div>
-      ) : (
-        <div className="flex flex-col gap-2">
-          <span className="text-red-500 font-medium">
-            Not allowed to create volume
-          </span>
-        </div>
-      )}
 
-      {/* Conditional Month Selection based on Quarter */}
-      {validQuarter && (
-        <div className="flex flex-col gap-2">
-          <label className="font-medium text-sm">Month</label>
-          <select
-            {...register("month")}
-            defaultValue={data?.month}
-            className="p-2 border rounded-md"
-          >
-            {getMonthOptions().map((month, index) => (
-              <option key={index} value={month}>
-                {month}
-              </option>
-            ))}
-          </select>
-          {errors?.month && (
-            <span className="text-red-500 text-xs">{errors.month.message}</span>
-          )}
-        </div>
-      )}
+      <div className="flex flex-col gap-2">
+        <label className="font-medium text-sm">Quarter</label>
+        <select
+          {...register("quarter")}
+          defaultValue={data?.quarter}
+          className="p-2 border rounded-md"
+        />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <label className="font-medium text-sm">Month</label>
+        <select
+          {...register("month")}
+          defaultValue={data?.month}
+          className="p-2 border rounded-md"
+        >
+          {getMonthOptions().map((month, index) => (
+            <option key={index} value={month}>
+              {month}
+            </option>
+          ))}
+        </select>
+        {errors?.month && (
+          <span className="text-red-500 text-xs">{errors.month.message}</span>
+        )}
+      </div>
 
       {/* Conditional Year Selection */}
       {validYear ? (
@@ -244,4 +234,4 @@ const VolumeActualProduceForm = ({
   );
 };
 
-export default VolumeActualProduceForm;
+export default ProduceForm;

@@ -10,9 +10,19 @@ const tabsData = [
     link: "/list/volumes",
   },
   {
-    label: "Actual Volumes",
-    value: "actual",
-    link: "/list/volumes/actual",
+    label: "Actual Produce",
+    value: "produce",
+    link: "/list/volumes/produce",
+  },
+  {
+    label: "Sold",
+    value: "sold",
+    link: "/list/volumes/sold",
+  },
+  {
+    label: "Lift",
+    value: "lift",
+    link: "/list/volumes/lift",
   },
 ];
 

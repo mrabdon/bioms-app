@@ -69,10 +69,10 @@ const LoginPage = () => {
           <p className="text-center text-sm text-zinc-500">
             No account?{" "}
             <a
-              href="#"
+              href="/reset-password"
               className="font-medium text-blue-500 decoration-zinc-950/20 underline-offset-4 outline-none hover:text-blue-400 hover:underline focus-visible:underline"
             >
-              Create an account
+              Reset Password
             </a>
           </p>
         </SignIn.Step>

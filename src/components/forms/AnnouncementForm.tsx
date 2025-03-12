@@ -19,7 +19,7 @@ const AnnouncementForm = ({
   setOpen,
   relatedData,
 }: {
-  type: "create" | "update" | "createActual";
+  type: "create" | "update" | "invite" | "createProduce" | "createSold" | "createLift";
   data?: any;
   setOpen: Dispatch<SetStateAction<boolean>>;
   relatedData?: any;

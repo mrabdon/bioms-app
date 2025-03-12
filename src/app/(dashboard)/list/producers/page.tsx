@@ -3,14 +3,14 @@ import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
 import { role } from "@/lib/data";
 import prisma from "@/lib/prisma";
-import { Prisma, Producer, User } from "@prisma/client";
+import { Company, Prisma } from "@prisma/client";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import FormContainer from "@/components/FormContainer";
 import { auth } from "@clerk/nextjs/server";
 
-type ProducerList = Producer & { users: User[] };
+type CompanyList = Company & { company: Company[] };
 
-const renderRow = (item: ProducerList) => (
+const renderRow = (item: CompanyList) => (
   <tr
     key={item.id}
     className="border-b text-sm border-gray-200  font-medium hover:bg-gray-100"
@@ -77,7 +77,7 @@ const ProducerListPage = async ({
     },
   ];
 
-  let query: Prisma.ProducerWhereInput = {};
+  let query: Prisma.CompanyWhereInput = {};
 
   if (queryParams) {
     for (const [key, value] of Object.entries(queryParams)) {
@@ -98,15 +98,15 @@ const ProducerListPage = async ({
   }
 
   const [data, count] = await prisma.$transaction([
-    prisma.producer.findMany({
+    prisma.company.findMany({
       where: query,
       include: {
-        users: true,
+        producers: true,
       },
       take: ITEM_PER_PAGE,
       skip: ITEM_PER_PAGE * (p - 1),
     }),
-    prisma.producer.count({ where: query }),
+    prisma.company.count({ where: query }),
   ]);
 
   return (
@@ -124,7 +124,7 @@ const ProducerListPage = async ({
       <div className="sm:flex sm:items-center justify-between mb-4 gap-4">
         <TableSearch />
         {role === "admin" && (
-          // <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
+          // <button className="w-8 h-8 flex items-center justify-center rounded-full bg-biomsYellow">
           //   <Image src="/plus.png" alt="" width={14} height={14} />
           // </button>
           <FormContainer table="producer" type="create" />

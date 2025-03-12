@@ -4,23 +4,18 @@ import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
 import { role } from "@/lib/data";
 import prisma from "@/lib/prisma";
-import { Consumer, Prisma, User } from "@prisma/client";
+import { Consumer, Prisma, Producer } from "@prisma/client";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import FormContainer from "@/components/FormContainer";
 import { auth } from "@clerk/nextjs/server";
 
-type ConsumerList = Consumer & { users: User[] };
+type ConsumerList = Consumer & { producers: Producer[] };
 
 const ConsumerListPage = async ({
   searchParams,
 }: {
   searchParams: { [key: string]: string | undefined };
 }) => {
-  const { page, ...queryParams } = searchParams;
-  const p = page ? parseInt(page) : 1;
-
-  const { sessionClaims } = auth();
-  const role = (sessionClaims?.metadata as { role?: string })?.role;
   const columns = [
     {
       header: "ID",
@@ -60,6 +55,12 @@ const ConsumerListPage = async ({
       </td>
     </tr>
   );
+
+  const { page, ...queryParams } = searchParams;
+  const p = page ? parseInt(page) : 1;
+
+  const { sessionClaims } = auth();
+  const role = (sessionClaims?.metadata as { role?: string })?.role;
   //URL PARAMS CONDITION
 
   let query: Prisma.ConsumerWhereInput = {};
@@ -105,7 +106,7 @@ const ConsumerListPage = async ({
       <div className="sm:flex sm:items-center justify-between mb-4 gap-4">
         <TableSearch />
         {role === "admin" && (
-          // <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
+          // <button className="w-8 h-8 flex items-center justify-center rounded-full bg-biomsYellow">
           //   <Image src="/plus.png" alt="" width={14} height={14} />
           // </button>
           <FormContainer table="consumer" type="create" />

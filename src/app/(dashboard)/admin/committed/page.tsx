@@ -8,15 +8,16 @@ import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import { auth } from "@clerk/nextjs/server";
 import {
+  Company,
   Consumer,
   Prisma,
   Producer,
+  Sold,
   Volume,
-  VolumeSoldToProducer,
 } from "@prisma/client";
 
-type VolumeList = Volume & { producer: Producer } & { consumer: Consumer } & {
-  volumeSoldToProducers: VolumeSoldToProducer[];
+type VolumeList = Volume & { companies: Company[] } & { consumer: Consumer } & {
+  sold: Sold[];
 };
 
 const CommittedPage = async ({
@@ -29,30 +30,42 @@ const CommittedPage = async ({
   const currentUserId = userId;
 
   const columns = [
-    { header: "Month", accessor: "month", className: "p-4" },
     {
       header: "Producer",
       accessor: "committedVolume",
-      className: "",
+      className: "p-4",
     },
+    { header: "Quarter / Year", accessor: "quarter", className: "p-4" },
     { header: "Committed Volume", accessor: "committedVolume", className: "" },
     { header: "Date Created", accessor: "committedVolume", className: "" },
   ];
 
-  const renderRow = (item: VolumeList & { producer: Producer[] }) => (
+  const renderRow = (item: VolumeList & { company: Company[] }) => (
     <tr
       key={item.id}
       className="border-b text-sm border-gray-200 even:bg-slate-50 font-medium hover:bg-gray-100"
     >
-      <td className="flex items-center gap-2 p-4">
-        {" "}
-        {new Date(item.createdAt)
-          .toLocaleDateString("en-US", { year: "numeric", month: "short" })
-          .split(" ")
-          .reverse()
-          .join(" ")}
+      <td className="p-4">
+        {item.companies.map((company) => (
+          <span key={company.id}>{company.name}</span>
+        ))}
       </td>
-      <td>{item.producer?.name || "-"}</td>
+      <td className="flex items-center gap-2 p-4">
+        {!item.quarter || !item.year ? (
+          <span>
+            {" "}
+            {new Date(item.createdAt)
+              .toLocaleDateString("en-US", { year: "numeric", month: "short" })
+              .split(" ")
+              .reverse()
+              .join(" ")}
+          </span>
+        ) : (
+          <span>
+            {item.quarter} {item.year}
+          </span>
+        )}
+      </td>
 
       <td> {item.committedVolume?.toLocaleString()}</td>
       <td className="hidden md:table-cell">
@@ -82,16 +95,16 @@ const CommittedPage = async ({
     prisma.volume.findMany({
       where: query,
       include: {
-        producer: { select: { name: true } },
+        companies: true,
         consumer: { select: { name: true } },
-        volumeSoldToProducers: {
+        solds: {
           select: {
             soldAmount: true, // Correct placement of soldAmount
-            consumers: { select: { name: true } },
-            producers: { select: { name: true } },
+            consumer: { select: { name: true } },
+            Company: { select: { name: true } },
           },
         },
-        actualProduces: true,
+        produces: true,
       },
       take: ITEM_PER_PAGE,
       skip: ITEM_PER_PAGE * (p - 1),
@@ -101,7 +114,7 @@ const CommittedPage = async ({
 
   // ✅ Server-side rendering with no direct event handlers passed
   return (
-    <div className="p-4 flex bg-white gap-4 border flex-col md:flex-row">
+    <div className="p-4 flex gap-4 flex-col md:flex-row border bg-white h-screen overflow-hidden">
       <div className="w-full flex flex-col">
         <TabContainer />
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">

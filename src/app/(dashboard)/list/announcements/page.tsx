@@ -7,6 +7,7 @@ import { ITEM_PER_PAGE } from "@/lib/settings";
 import { Announcement, Prisma, Producer } from "@prisma/client";
 import Image from "next/image";
 import { auth } from "@clerk/nextjs/server";
+import DropdownMenu from "@/components/DropdownMenu";
 
 type AnnouncementList = Announcement & { producer: Producer };
 const AnnouncementListPage = async ({
@@ -22,6 +23,7 @@ const AnnouncementListPage = async ({
     {
       header: "Title",
       accessor: "title",
+      className: "hidden md:table-cell p-4",
     },
 
     {
@@ -42,7 +44,7 @@ const AnnouncementListPage = async ({
   const renderRow = (item: AnnouncementList) => (
     <tr
       key={item.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
+      className="border-b text-sm border-gray-200  font-medium hover:bg-gray-100"
     >
       <td className="flex items-center gap-4 p-4">{item.title}</td>
       <td className="hidden md:table-cell">
@@ -108,12 +110,18 @@ const AnnouncementListPage = async ({
   ]);
 
   return (
-    <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
+    <div className="bg-white border p-4 flex-1 ">
       {/* TOP */}
       <div className="flex items-center justify-between">
-        <h1 className="hidden md:block text-lg font-semibold">
-          All Announcements
-        </h1>
+        {/* TOP */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
+          <div className="mb-4 md:mb-0">
+            <h1 className="text-2xl font-bold text-gray-800">Announcements</h1>
+            <p className="text-sm text-gray-500">
+              View and manage announcements
+            </p>
+          </div>
+        </div>
         <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
           <TableSearch />
           <div className="flex items-center gap-4 self-end">
